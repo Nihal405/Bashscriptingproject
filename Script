@@ -1,35 +1,26 @@
 #!/bin/bash
 
-# Set the backup directory
 backup_dir="/backup"
 
-# Set the directories to backup
 backup_dirs=( "/etc" "/var/log" )
-
-# Set the destination for the backup
 backup_dest="/mnt/backup"
 
-# Set the log file for the backup
 log_file="/var/log/backup.log"
 
-# Set the current date and time
 timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
 
-# Create the backup directory if it doesn't exist
 if [ ! -d "$backup_dir" ]; then
     mkdir -p $backup_dir
 fi
 
-# Create a subdirectory for the current backup
 backup_subdir="$backup_dir/backup-$timestamp"
 mkdir -p $backup_subdir
 
-# Iterate through the directories to backup
 for dir in "${backup_dirs[@]}"; do
-    # Create a backup file for the directory
+
     backup_file="$backup_subdir/$(basename $dir).tar.gz"
 
-    # Backup the directory and log the result
+   
     tar -czf $backup_file $dir
     if [ $? -eq 0 ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup of $dir succeeded" >> $log_file
@@ -38,7 +29,6 @@ for dir in "${backup_dirs[@]}"; do
     fi
 done
 
-# Copy the backup to the destination and log the result
 rsync -avz $backup_subdir/ $backup_dest
 if [ $? -eq 0 ]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup copied to $backup_dest" >> $log_file
